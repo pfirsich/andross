@@ -86,6 +86,9 @@ function Animation:addKeyframe(time, keyframeType, name, keyName, value, curve)
 end
 
 function Animation:getPose(time, keyframeType, name, keyName)
+    -- move time into [0, self.duration]
+    time = time - math.floor(time / self.duration) * self.duration
+
     local pose = Pose()
     for _keyframeTypeName, _keyframeType in pairs(self.keyframes) do
         if keyframeType == nil or _keyframeTypeName == keyframeType then

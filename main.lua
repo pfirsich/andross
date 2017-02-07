@@ -27,7 +27,6 @@ function love.update()
         anim = anims[animName]
     end
     local time = love.timer.getTime()
-    time = time - math.floor(time / anim.duration) * anim.duration
     local pose = anim:getPose(time)
     pose:apply(skel)
     skel:update()
