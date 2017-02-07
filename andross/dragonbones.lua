@@ -56,8 +56,8 @@ local function importDragonBones(str, imagePathPrefix)
             -- TODO: make this check more accurate
             -- This is optimized for coa_blender's weird way of exporting
             local isImage = #data.vertices == 8
-            local boneIndex = nil
             if data.weights then
+                local boneIndex
                 for i = 1, #data.weights, 3 do
                     if boneIndex and boneIndex ~= data.weights[i+1] then
                         isImage = false
@@ -70,10 +70,11 @@ local function importDragonBones(str, imagePathPrefix)
                         break
                     end
                 end
+                boneIndex = boneIndex + 1 -- we use 1-based indexing, the file uses 0
 
                 if isImage then
                     local attachment = andross.backend.ImageAttachment(attachment.name, imagePathPrefix .. attachment.name)
-                    skin:addAttachment(boneIndex+1, attachment)
+                    skin:addAttachment(boneIndex, attachment)
 
                     -- world space in data.transform (or more accurate: in the space of the root bone)
                     attachment.positionX = data.transform.x or 0
@@ -82,12 +83,14 @@ local function importDragonBones(str, imagePathPrefix)
                     attachment.scaleX = data.transform.scX or 1
                     attachment.scaleY = data.transform.scY or 1
 
-                    local worldTransform = andross.math.transformMatrix(attachment.positionX, attachment.positionY,
-                                            attachment.angle, attachment.scaleX, attachment.scaleY)
-                    local finalTransform = andross.math.matrixMultiply(andross.math.matrixInverse(skel.bones[boneIndex+1].worldTransform.matrix), worldTransform)
+                    -- COA parents every slot to the Armature itself, not to the bone it's attached to.
+                    -- So the attachment's transformation are in world space and we have to convert to the bone's space
+                    local worldTransform = andross.math.Transform(attachment.positionX, attachment.positionY,
+                                                                  attachment.angle, attachment.scaleX, attachment.scaleY)
+                    local finalTransform = skel.bones[boneIndex].worldTransform:inverse():compose(worldTransform)
 
                     attachment.positionX, attachment.positionY, attachment.angle,
-                    attachment.scaleX, attachment.scaleY = andross.math.extractPosRotScale(finalTransform)
+                    attachment.scaleX, attachment.scaleY = finalTransform:decomposeTRS()
                 else
                     print("Real mesh!")
                 end
