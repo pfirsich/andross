@@ -4,7 +4,8 @@ importDragonBones = require "andross.dragonbones"
 
 function love.load(args)
     --skel, anims, skin = importDragonBones(love.filesystem.read("media/monstar_arm/monstar_arm.json"), "media/monstar_arm/sprites/")
-    skel, anims, skin = importDragonBones(love.filesystem.read("media/stip/stip.json"), "media/stip/sprites/")
+    local resMan = andross.backend.AttachmentManager("media/stip/sprites/")
+    skel, anims, skin = importDragonBones(love.filesystem.read("media/stip/stip.json"), resMan)
     --skel, anims, skin = importDragonBones(love.filesystem.read("media/db_export/NewDragon_ske.json"), "")
     --skel, anims, skin = importDragonBones(love.filesystem.read("media/hampelmann/hampelmann.json"), "")
     --skel, anims, skin = importDragonBones(love.filesystem.read("media/wobble/wobble.json"), "")

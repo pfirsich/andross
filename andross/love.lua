@@ -5,20 +5,12 @@ local backend = {}
 
 backend.ImageAttachment = class("ImageAttachment", andross.Attachment)
 
-function backend.ImageAttachment:initialize(name, imagePath)
+function backend.ImageAttachment:initialize(name, image, quad)
     andross.Attachment.initialize(self, name)
-
-    self.imagePath = imagePath
+    self.image = image
+    self.quad = quad
     self.offsetX = 0
     self.offsetY = 0
-end
-
-local imageMap = {}
-local function getImage(path)
-    if not imageMap[path] then
-        imageMap[path] = love.graphics.newImage(path)
-    end
-    return imageMap[path]
 end
 
 function backend.ImageAttachment:draw(skeleton)
@@ -38,7 +30,11 @@ function backend.ImageAttachment:draw(skeleton)
 
     -- draw
     lg.setColor(255, 255, 255, 255)
-    lg.draw(getImage(self.imagePath), self.positionX, self.positionY, self.angle, self.scaleX, self.scaleY)
+    if quad then
+        lg.draw(self.image, self.quad, self.positionX, self.positionY, self.angle, self.scaleX, self.scaleY)
+    else
+        lg.draw(self.image, self.positionX, self.positionY, self.angle, self.scaleX, self.scaleY)
+    end
 
     if drawBones then
         lg.rectangle("fill", 0, -20, bone.length, 40)
@@ -48,5 +44,36 @@ function backend.ImageAttachment:draw(skeleton)
 
     lg.pop()
 end
+
+backend.AttachmentManager = class("AttachmentManager")
+
+function backend.AttachmentManager:initialize(imagePathPrefix)
+    self.prefix = imagePathPrefix
+    self.imageMap = {}
+end
+
+function backend.AttachmentManager:getImageAttachment(name)
+    local ret = self.imageMap[name]
+    if ret == nil then
+        local ret = backend.ImageAttachment(name, love.graphics.newImage(self.prefix .. name))
+        self.imageMap[name] = ret
+        return ret
+    else
+        return ret
+    end
+end
+
+--function backend.AttachmentManager:getMesh(name, otherStuff) end
+
+backend.AtlasAttachmentManager = class("AtlasAttachmentManager")
+
+-- atlasData = list of {x = .., y = .., width = .., height = .., name = ..}
+function backend.AtlasAttachmentManager:initialize(imagePath, atlasData)
+    self.imageMap = {}
+    for _, image in ipairs(atlasData) do
+        --self.imageMap[image.name] =
+    end
+end
+
 
 return backend

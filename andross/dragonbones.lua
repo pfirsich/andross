@@ -1,7 +1,7 @@
 local andross = require "andross"
 local json = require "andross.json"
 
-local function importDragonBones(str, imagePathPrefix)
+local function importDragonBones(str, attachmentManager)
     local transforms = {
         "x", "y", "skX", "scX", "scY"
     }
@@ -73,7 +73,7 @@ local function importDragonBones(str, imagePathPrefix)
                 boneIndex = boneIndex + 1 -- we use 1-based indexing, the file uses 0
 
                 if isImage then
-                    local attachment = andross.backend.ImageAttachment(attachment.name, imagePathPrefix .. attachment.name)
+                    local attachment = attachmentManager:getImageAttachment(attachment.name)
                     skin:addAttachment(boneIndex, attachment)
 
                     -- world space in data.transform (or more accurate: in the space of the root bone)
@@ -98,7 +98,7 @@ local function importDragonBones(str, imagePathPrefix)
         end
 
         if data.type == "image" then
-            local attachment = andross.backend.ImageAttachment(attachment.name, imagePathPrefix .. attachment.name)
+            local attachment = attachmentManager:getImageAttachment(attachment.name)
             skin:addAttachment(jsonArmature.slot[attachmentIndex].parent, attachment)
             for _, name in ipairs(transforms) do
                 if data.transform[name] then
