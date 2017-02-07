@@ -1,49 +1,6 @@
 local andross = require "andross"
 local json = require "andross.json"
 
-local function matrixMultiply(a, b)
-    return {
-        a[1]*b[1] + a[2]*b[3], -- a*a'+b*c'
-        a[1]*b[2] + a[2]*b[4], -- a*b'+b*d'
-        a[3]*b[1] + a[4]*b[3], -- c*a'+d*c'
-        a[3]*b[2] + a[4]*b[4], -- c*b'+d*d'
-        a[1]*b[5] + a[2]*b[6] + a[5], -- a*t_x'+b*t_y'+t_x
-        a[3]*b[5] + a[4]*b[6] + a[6], -- c*t_x'+d*t_y'+t_y
-    }
-end
-
-local function matrixInverse(m)
-    local a = 1 / (m[1]*m[4] - m[2]*m[3]) -- 1/det
-    return {
-        -- d, -b, -c, a
-        a*m[4], -a*m[2], -a*m[3], a*m[1],
-        -- b*t_y - d*t_x
-        a*(m[2]*m[6] - m[4]*m[5]),
-        -- c*t_x - a*t_y
-        a*(m[3]*m[5] - m[1]*m[6]),
-    }
-end
-
--- http://math.stackexchange.com/questions/13150/extracting-rotation-scale-values-from-2d-transformation-matrix
--- choose scale positive
-local function extractPosRotScale(m)
-    local x, y = m[5], m[6]
-    local angle = math.atan2(-m[2], m[1])
-    --local angle = math.atan2(m[3], m[4])
-    local sX = math.sqrt(m[1]*m[1] + m[2]*m[2])
-    local sY = math.sqrt(m[3]*m[3] + m[4]*m[4])
-    return x, y, angle, sX, sY
-end
-
-local function transformMatrix(x, y, angle, scaleX, scaleY)
-    local c, s = math.cos(angle), math.sin(angle)
-    return {
-        scaleX * c, scaleY * -s,
-        scaleX * s, scaleY * c,
-        x, y
-    }
-end
-
 local function importDragonBones(str, imagePathPrefix)
     local transforms = {
         "x", "y", "skX", "scX", "scY"
@@ -125,12 +82,12 @@ local function importDragonBones(str, imagePathPrefix)
                     attachment.scaleX = data.transform.scX or 1
                     attachment.scaleY = data.transform.scY or 1
 
-                    local worldTransform = transformMatrix(attachment.positionX, attachment.positionY,
+                    local worldTransform = andross.math.transformMatrix(attachment.positionX, attachment.positionY,
                                             attachment.angle, attachment.scaleX, attachment.scaleY)
-                    local finalTransform = matrixMultiply(matrixInverse(skel.bones[boneIndex+1].worldTransform.matrix), worldTransform)
+                    local finalTransform = andross.math.matrixMultiply(andross.math.matrixInverse(skel.bones[boneIndex+1].worldTransform.matrix), worldTransform)
 
                     attachment.positionX, attachment.positionY, attachment.angle,
-                    attachment.scaleX, attachment.scaleY = extractPosRotScale(finalTransform)
+                    attachment.scaleX, attachment.scaleY = andross.math.extractPosRotScale(finalTransform)
                 else
                     print("Real mesh!")
                 end

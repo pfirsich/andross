@@ -1,17 +1,5 @@
 local class = require "andross.middleclass"
-
-function normalizeAngle(a)
-    while a >  math.pi do a = a - 2*math.pi end
-    while a < -math.pi do a = a + 2*math.pi end
-    return a
-end
-
-function blendAngles(a, b, mix)
-    local delta = b - a
-    while delta >  math.pi do delta = delta - 2*math.pi end
-    while delta < -math.pi do delta = delta + 2*math.pi end
-    return normalizeAngle(a + delta * mix)
-end
+local androssMath = require "andross.math"
 
 local Pose = class("Pose")
 
@@ -38,6 +26,7 @@ function Pose:getPoseValue(type, name, key)
     return self.values[type][name][key]
 end
 
+-- TODO: implement this fully
 function Pose:blend(otherPose, mix)
     local ret = Pose()
     for typeName, _type in pairs(self.values) do
@@ -50,6 +39,7 @@ function Pose:blend(otherPose, mix)
                 end
                 ret:setPoseValue(typeName, objName, keyName, value)
                 -- TODO: otherPose-values that self does not have
+                -- TODO: blend angles properly
             end
         end
     end
@@ -109,16 +99,16 @@ function Animation:getPose(time, keyframeType, name, keyName)
                                 pose:setPoseValue(_keyframeTypeName, _name, _keyName, key[#key].value)
                             else
                                 -- TODO: binary search?
+                                -- the first keyframe is always at t = 0, see notes
                                 for keyframeIndex = 2, #key do
-                                    -- the first keyframe is always at t = 0
                                     if time < key[keyframeIndex].time then
                                         local keyframe = key[keyframeIndex-1]
                                         local nextKeyframe = key[keyframeIndex]
                                         local alpha = (time - keyframe.time) / (nextKeyframe.time - keyframe.time)
                                         -- TODO: curves -> if keyframe.curve then alpha = keyframe.curve(alpha) end
                                         local value = keyframe.value + (nextKeyframe.value - keyframe.value) * alpha
-                                        if _keyName == "angle" then
-                                            value = blendAngles(keyframe.value, nextKeyframe.value, alpha)
+                                        if _keyName == "angle" then -- I really don't like this if
+                                            value = andross.math.lerpAngles(keyframe.value, nextKeyframe.value, alpha)
                                         end
                                         pose:setPoseValue(_keyframeTypeName, _name, _keyName, value)
                                         break
