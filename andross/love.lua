@@ -30,7 +30,7 @@ function backend.ImageAttachment:draw(skeleton)
 
     -- draw
     lg.setColor(255, 255, 255, 255)
-    if quad then
+    if self.quad then
         lg.draw(self.image, self.quad, self.positionX, self.positionY, self.angle, self.scaleX, self.scaleY)
     else
         lg.draw(self.image, self.positionX, self.positionY, self.angle, self.scaleX, self.scaleY)
@@ -49,18 +49,10 @@ backend.AttachmentManager = class("AttachmentManager")
 
 function backend.AttachmentManager:initialize(imagePathPrefix)
     self.prefix = imagePathPrefix
-    self.imageMap = {}
 end
 
 function backend.AttachmentManager:getImageAttachment(name)
-    local ret = self.imageMap[name]
-    if ret == nil then
-        local ret = backend.ImageAttachment(name, love.graphics.newImage(self.prefix .. name))
-        self.imageMap[name] = ret
-        return ret
-    else
-        return ret
-    end
+    return backend.ImageAttachment(name, love.graphics.newImage(self.prefix .. name))
 end
 
 --function backend.AttachmentManager:getMesh(name, otherStuff) end
@@ -69,11 +61,18 @@ backend.AtlasAttachmentManager = class("AtlasAttachmentManager")
 
 -- atlasData = list of {x = .., y = .., width = .., height = .., name = ..}
 function backend.AtlasAttachmentManager:initialize(imagePath, atlasData)
+    self.image = love.graphics.newImage(imagePath)
     self.imageMap = {}
+
+    local iW, iH = self.image:getDimensions()
     for _, image in ipairs(atlasData) do
-        --self.imageMap[image.name] =
+        local quad = love.graphics.newQuad(image.x, image.y, image.width, image.height, iW, iH)
+        self.imageMap[image.name] = backend.ImageAttachment(image.name, self.image, quad)
     end
 end
 
+function backend.AtlasAttachmentManager:getImageAttachment(name)
+    return self.imageMap[name]
+end
 
 return backend

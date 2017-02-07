@@ -1,15 +1,19 @@
 andross = require "andross"
 andross.backend = require "andross.love"
-importDragonBones = require "andross.dragonbones"
+dragonBones = require "andross.dragonbones"
 
 function love.load(args)
-    --skel, anims, skin = importDragonBones(love.filesystem.read("media/monstar_arm/monstar_arm.json"), "media/monstar_arm/sprites/")
-    local resMan = andross.backend.AttachmentManager("media/stip/sprites/")
-    skel, anims, skin = importDragonBones(love.filesystem.read("media/stip/stip.json"), resMan)
-    --skel, anims, skin = importDragonBones(love.filesystem.read("media/db_export/NewDragon_ske.json"), "")
-    --skel, anims, skin = importDragonBones(love.filesystem.read("media/hampelmann/hampelmann.json"), "")
-    --skel, anims, skin = importDragonBones(love.filesystem.read("media/wobble/wobble.json"), "")
-    --skel, anims, skin = importDragonBones(love.filesystem.read("media/dude/dude.json"), "media/dude/dude/sprites/")
+    --mgr = andross.backend.AttachmentManager("media/monstar_arm/sprites/")
+    --skel, anims, skin = dragonBones.import(love.filesystem.read("media/monstar_arm/monstar_arm.json"), mgr)
+
+    mgr = andross.backend.AttachmentManager("media/stip/sprites/")
+    skel, anims, skin = dragonBones.import(love.filesystem.read("media/stip/stip.json"), mgr)
+
+    --mgr = andross.backend.AtlasAttachmentManager("media/db_export/NewDragon_tex.png", dragonBones.importAtlasData(love.filesystem.read("media/db_export/NewDragon_tex.json")))
+    --skel, anims, skin = dragonBones.import(love.filesystem.read("media/db_export/NewDragon_ske.json"), mgr)
+
+    --mgr = andross.backend.AttachmentManager("media/dude/dude/sprites")
+    --skel, anims, skin = dragonBones.import(love.filesystem.read("media/dude/dude.json"), mgr)
 
     scale = 0.2
     animName = args[2]
@@ -36,6 +40,18 @@ function love.draw()
     lg.scale(scale, scale)
     skin:render(skel)
     lg.pop()
+
+    -- lg.setColor(255, 255, 255, 255)
+    -- local x, y = 0, 0
+    -- for k, v in pairs(mgr.imageMap) do
+    --     lg.draw(v.image, v.quad, x, y)
+    --     lg.print(k, x, y)
+    --     x = x + 200
+    --     if x > lg.getWidth() then
+    --         y = y + 200
+    --         x = 0
+    --     end
+    -- end
 end
 
 function love.wheelmoved(dx, dy)

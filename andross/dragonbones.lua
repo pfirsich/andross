@@ -1,7 +1,9 @@
 local andross = require "andross"
 local json = require "andross.json"
 
-local function importDragonBones(str, attachmentManager)
+local dragonBones = {}
+
+function dragonBones.import(str, attachmentManager)
     local transforms = {
         "x", "y", "skX", "scX", "scY"
     }
@@ -113,4 +115,8 @@ local function importDragonBones(str, attachmentManager)
     return skel, anims, skin
 end
 
-return importDragonBones
+function dragonBones.importAtlasData(str)
+    return json.decode(str).SubTexture
+end
+
+return dragonBones
