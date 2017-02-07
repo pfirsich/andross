@@ -1,0 +1,80 @@
+armature: # only one, in every project
+	frameRate
+	name
+	type: "Armature"
+	
+	defaultActions: # don't care, mostly empty
+	
+	aabb:
+		x
+		y
+		width
+		height
+		
+	ik: # don't care yet?
+	
+	slot: # just a list of all images, for each attachment
+	0:
+		name: 
+		parent: "Armature"
+		
+	bone: # list, one element for each bone + root
+		0:
+			name: "Armature"
+			transform: empty 
+		1: 
+			name
+			parent: # a name 
+			length:
+			transform: # relative to parent
+				x: 
+				y: 
+				skX: # euler angles, == skY
+				skY:
+		2: ...
+		
+	skin: # for each image 
+		0:
+			name: "" 
+			slot: # for each attachment
+				0:
+					name: *.png
+					display:
+						0: # only this apparently?
+							type: "mesh"
+							name: "sprites/<name>_atlas"
+							width: # ???
+							height: # ???
+							vertices: # 8 for quads
+							edges: # 8 for quads
+							triangles: # for regular images the edges seem to be the outer edges of the quad. this is then just 0, 1, 2, 3
+							uvs: # a little weird for some reason
+							weights: # These are pairs of three for every vertex. First: Always 1???, Second: Bone Index, Third: Weight
+							bonePose: boneIndex, matrix [4-values, see slotPose, translateX, translateY]
+							slotPose: # First matrix: [a_11, a_12, a_21, a_22] (1 0 0 1), translationX, translationY
+							transform: # Seems to be the same, but with x, y, skX, skY, scX, scY-keys
+						
+	
+	animation: # one for each animation 
+		0:
+			name: "Restpose"
+			duration: 1
+			playTimes: 1
+		1:
+			name:
+			duration:  # frames, see frameRate
+			playTimes:
+			frame: # ??
+			slot: # I guess here slot properties can be animated, rendering order, color, etc.
+			ffd: # Here keyframes for FFD are stores, don't care 
+			
+			bone: # for each bone 
+				i:
+					name: Bone
+					frame: # list, for each keyframe 
+						i:
+							transform: # these transforms are relative to the setup pose! but the translation is computed weirdly?!
+								as usual: x, y, skX, skY, ...
+							tweenEasing: 0
+							duration: # The length of the keyframe. If the first keyframe is not at 0, there will be one inserted that's a copy of the first. The last keyframe has the full duration of the animation and not the relative duration to the next keyframe anymore. (Why is this?)
+
