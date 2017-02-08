@@ -82,12 +82,13 @@ function androssMath.Transform:decomposeTRS()
     -- http://math.stackexchange.com/questions/13150/extracting-rotation-scale-values-from-2d-transformation-matrix
     -- I'm not sure if I calculcate the signs correctly (i.e. if my consideration of the sign of the cosine is necessary)
     -- but I don't understand how it's not (and it works!)
+    -- Also that guy got the product of the matrices wrong (it's rotation * scale) so it's s_x = sqrt(a^2 + c^2), etc..
     local m = self.matrix
     local x, y = m[5], m[6]
-    local angle = math.atan2(m[3], m[4])
+    local angle = math.atan2(m[3], m[1])
     local cosSign = androssMath.sign(math.cos(angle))
-    local sX = androssMath.sign(m[1]) / cosSign * math.sqrt(m[1]*m[1] + m[2]*m[2])
-    local sY = androssMath.sign(m[4]) / cosSign * math.sqrt(m[3]*m[3] + m[4]*m[4])
+    local sX = androssMath.sign(m[1]) / cosSign * math.sqrt(m[1]*m[1] + m[3]*m[3])
+    local sY = androssMath.sign(m[4]) / cosSign * math.sqrt(m[2]*m[2] + m[4]*m[4])
     return x, y, angle, sX, sY
 end
 
