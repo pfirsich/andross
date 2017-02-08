@@ -55,7 +55,8 @@ function dragonBones.import(str, attachmentManager)
     for attachmentIndex, attachment in ipairs(jsonArmature.skin[1].slot) do
         local data = attachment.display[1]
         if data.type == "mesh" then
-            -- TODO: make this check more accurate
+            -- JUST USE MESHES
+            -- TODO: make this check more accurate,
             -- This is optimized for coa_blender's weird way of exporting
             local isImage = #data.vertices == 8
             if data.weights then
@@ -79,20 +80,15 @@ function dragonBones.import(str, attachmentManager)
                     skin:addAttachment(boneIndex, attachment)
 
                     -- world space in data.transform (or more accurate: in the space of the root bone)
-                    attachment.positionX = data.transform.x or 0
-                    attachment.positionY = data.transform.y or 0
-                    attachment.angle = (data.transform.skX or 0) * math.pi/180.0
-                    attachment.scaleX = data.transform.scX or 1
-                    attachment.scaleY = data.transform.scY or 1
-
                     -- COA parents every slot to the Armature itself, not to the bone it's attached to.
                     -- So the attachment's transformation are in world space and we have to convert to the bone's space
-                    local worldTransform = andross.math.Transform(attachment.positionX, attachment.positionY,
-                                                                  attachment.angle, attachment.scaleX, attachment.scaleY)
+                    local angle = (data.transform.skX or 0) * math.pi/180.0
+                    local worldTransform = andross.math.Transform(data.transform.x, data.transform.y,
+                                                                  angle, data.transform.scX, data.transform.scY)
                     local finalTransform = skel.bones[boneIndex].worldTransform:inverse():compose(worldTransform)
 
-                    attachment.positionX, attachment.positionY, attachment.angle,
-                    attachment.scaleX, attachment.scaleY = finalTransform:decomposeTRS()
+                    attachment.bindTransform = finalTransform
+                    --attachment.positionX, attachment.positionY, attachment.angle, attachment.scaleX, attachment.scaleY = finalTransform:decomposeTRS()
                 else
                     print("Real mesh!")
                 end
