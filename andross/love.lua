@@ -31,7 +31,6 @@ function backend.ImageAttachment:draw(skeleton)
     local bone = skeleton.bones[self.parentBoneName]
     lg.multiplyMatrix(bone.worldTransform.matrix)
 
-    lg.push()
     if self.bindTransform then
         lg.multiplyMatrix(self.bindTransform.matrix)
     end
@@ -43,13 +42,60 @@ function backend.ImageAttachment:draw(skeleton)
     else
         lg.draw(self.image, self.positionX, self.positionY, self.angle, self.scaleX, self.scaleY)
     end
-    lg.pop()
 
-    if drawBones then
-        lg.rectangle("fill", 0, -20, bone.length, 40)
-        lg.setColor(0, 0, 0, 255)
-        lg.rectangle("fill", 5, -20 + 5, bone.length - 10, 40 - 10)
+    lg.pop()
+end
+
+backend.MeshAttachment = class("MeshAttachment", andross.Attachment)
+
+-- vertices are a list of {x, y, u, v}
+-- weights are a list of {boneIndex1, weight1, boneIndex2, weight2, ...} for each vertex
+-- indices are one-based, boneIndices obviously too!
+function backend.MeshAttachment:initialize(name, image, vertices, weights, indices)
+    assert(#indices % 3 == 0, "Draw mode is 'triangles', so indices have to be a multiple of 3")
+    andross.Attachment.initialize(self, name)
+    self.vertices = vertices
+    self.indices = indices
+
+    self.static = true
+    local boneIndex
+    for i = 1, #vertices do
+        if #weights[i] == 2 then -- vertex only weighed to one bone
+            if boneIndex == nil then
+                boneIndex = weights[i][1]
+            end
+            if weights[i][1] ~= boneIndex then
+                -- not all vertices are bound to the same bone -> non-static -> skinning
+                self.static = false
+                break
+            end
+        end
     end
+    if self.static then
+        self.realParent = boneIndex
+    end
+
+    -- TODO: GPU skinning?
+    self.mesh = love.graphics.newMesh(vertices, "triangles", self.static and "static" or "stream")
+    self.mesh:setVertexMap(indices)
+    self.mesh:setTexture(image)
+end
+
+function backend.MeshAttachment:draw(skeleton)
+    local lg = love.graphics
+    lg.push()
+
+    -- apply bone transform
+    local bone = skeleton.bones[self.parentBoneName]
+    lg.multiplyMatrix(bone.worldTransform.matrix)
+
+    if self.bindTransform then
+        lg.multiplyMatrix(self.bindTransform.matrix)
+    end
+
+    -- draw
+    lg.setColor(255, 255, 255, 255)
+    lg.draw(self.mesh, self.positionX, self.positionY, self.angle, self.scaleX, self.scaleY)
 
     lg.pop()
 end
@@ -64,7 +110,9 @@ function backend.AttachmentManager:getImageAttachment(name)
     return backend.ImageAttachment(name, love.graphics.newImage(self.prefix .. name))
 end
 
---function backend.AttachmentManager:getMesh(name, otherStuff) end
+function backend.AttachmentManager:getMeshAttachment(name, vertices, weights, indices)
+    return backend.MeshAttachment(name, love.graphics.newImage(self.prefix .. name), vertices, weights, indices)
+end
 
 backend.AtlasAttachmentManager = class("AtlasAttachmentManager")
 

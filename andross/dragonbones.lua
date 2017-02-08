@@ -55,44 +55,57 @@ function dragonBones.import(str, attachmentManager)
     for attachmentIndex, attachment in ipairs(jsonArmature.skin[1].slot) do
         local data = attachment.display[1]
         if data.type == "mesh" then
-            -- JUST USE MESHES
-            -- TODO: make this check more accurate,
-            -- This is optimized for coa_blender's weird way of exporting
-            local isImage = #data.vertices == 8
-            if data.weights then
-                local boneIndex
-                for i = 1, #data.weights, 3 do
-                    if boneIndex and boneIndex ~= data.weights[i+1] then
-                        isImage = false
-                        break
-                    end
-                    boneIndex = data.weights[i+1]
+            local indices = {}
 
-                    if math.abs(data.weights[i+2] - 1.0) > 1e-2 then
-                        isImage = false
-                        break
-                    end
-                end
-                boneIndex = boneIndex + 1 -- we use 1-based indexing, the file uses 0
-
-                if isImage then
-                    local attachment = attachmentManager:getImageAttachment(attachment.name)
-                    skin:addAttachment(boneIndex, attachment)
-
-                    -- world space in data.transform (or more accurate: in the space of the root bone)
-                    -- COA parents every slot to the Armature itself, not to the bone it's attached to.
-                    -- So the attachment's transformation are in world space and we have to convert to the bone's space
-                    local angle = (data.transform.skX or 0) * math.pi/180.0
-                    local worldTransform = andross.math.Transform(data.transform.x, data.transform.y,
-                                                                  angle, data.transform.scX, data.transform.scY)
-                    local finalTransform = skel.bones[boneIndex].worldTransform:inverse():compose(worldTransform)
-
-                    attachment.bindTransform = finalTransform
-                    --attachment.positionX, attachment.positionY, attachment.angle, attachment.scaleX, attachment.scaleY = finalTransform:decomposeTRS()
-                else
-                    print("Real mesh!")
-                end
+            local vertices = {}
+            assert(#data.vertices == #data.uvs)
+            for i = 1, #data.vertices, 2 do
+                table.insert(vertices, {data.vertices[i], data.vertices[i+1], data.uvs[i], data.uvs[i+1]})
             end
+
+            -- TODO: DragonBones sometimes does not export weights - this case should be handled
+            local weights = {}
+            local i = 1
+            while i <= #data.weights do
+                local count = data.weights[i]
+                i = i + 1
+                local vertexWeights = {}
+                for c = 1, count do
+                    -- +1 because of 1-indexing
+                    table.insert(vertexWeights, data.weights[i+0] + 1) -- boneIndex
+                    table.insert(vertexWeights, data.weights[i+1]) -- weight
+                    i = i + 2
+                end
+                table.insert(weights, vertexWeights)
+            end
+
+            local indices = data.triangles
+            -- COA, why do you do this?
+            if #indices == 4 and indices[1] == 0 and indices[2] == 1 and
+                                 indices[3] == 2 and indices[4] == 3 then
+                indices = {0, 1, 2, 0, 2, 3}
+            end
+            -- 1-indexing
+            for i = 1, #indices do
+                indices[i] = indices[i] + 1
+            end
+
+            local attachment = attachmentManager:getMeshAttachment(attachment.name, vertices, weights, indices)
+            local parentBone = jsonArmature.slot[attachmentIndex].parent
+            if attachment.static then
+                parentBone = attachment.realParent
+            end
+            skin:addAttachment(parentBone, attachment)
+
+            -- data.transform stores world position bind pose transforms
+            -- COA parents every slot to the Armature itself, not to the bone it's attached to.
+            -- So the attachment's transformation are in world space and we have to convert to the bone's space
+            local angle = (data.transform.skX or 0) * math.pi/180.0
+            local worldTransform = andross.math.Transform(data.transform.x, data.transform.y,
+                                                          angle, data.transform.scX, data.transform.scY)
+            local finalTransform = skel.bones[parentBone].worldTransform:inverse():compose(worldTransform)
+            attachment.bindTransform = finalTransform
+            --attachment.positionX, attachment.positionY, attachment.angle, attachment.scaleX, attachment.scaleY = finalTransform:decomposeTRS()
         end
 
         if data.type == "image" then

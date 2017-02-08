@@ -35,10 +35,24 @@ end
 function love.draw()
     local lg = love.graphics
     lg.push()
-    lg.translate(lg.getWidth()/2, lg.getHeight()/2)
-    lg.scale(scale, scale)
-    skin:render(skel)
+        lg.translate(lg.getWidth()/2, lg.getHeight()/2)
+        lg.scale(scale, scale)
+
+        skin:render(skel)
+
+        for _, bone in ipairs(skel.bones) do
+            lg.push()
+            lg.multiplyMatrix(bone.worldTransform.matrix)
+            if drawBones then
+                lg.setColor(255, 255, 255, 255)
+                lg.rectangle("fill", 0, -20, bone.length, 40)
+                lg.setColor(0, 0, 0, 255)
+                lg.rectangle("fill", 5, -20 + 5, bone.length - 10, 40 - 10)
+            end
+            lg.pop()
+        end
     lg.pop()
+
 
     -- lg.setColor(255, 255, 255, 255)
     -- local x, y = 0, 0
