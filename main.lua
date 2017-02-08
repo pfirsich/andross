@@ -53,18 +53,19 @@ function love.draw()
         end
     lg.pop()
 
-
-    -- lg.setColor(255, 255, 255, 255)
-    -- local x, y = 0, 0
-    -- for k, v in pairs(mgr.imageMap) do
-    --     lg.draw(v.image, v.quad, x, y)
-    --     lg.print(k, x, y)
-    --     x = x + 200
-    --     if x > lg.getWidth() then
-    --         y = y + 200
-    --         x = 0
-    --     end
-    -- end
+    if drawImageMap and mgr.imageMap then
+        lg.setColor(255, 255, 255, 255)
+        local x, y = 0, 0
+        for k, v in pairs(mgr.imageMap) do
+            lg.draw(v.image, v.quad, x, y)
+            lg.print(k, x, y)
+            x = x + 200
+            if x > lg.getWidth() then
+                y = y + 200
+                x = 0
+            end
+        end
+    end
 end
 
 function love.wheelmoved(dx, dy)
@@ -74,4 +75,5 @@ end
 function love.keypressed(key)
     if key == "escape" then love.event.push("quit") end
     if key == "space" then drawBones = not drawBones end
+    if key == "rctrl" then drawImageMap = not drawImageMap end
 end

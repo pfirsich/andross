@@ -55,24 +55,28 @@ function backend.MeshAttachment:initialize(name, image, vertices, weights, indic
     assert(#indices % 3 == 0, "Draw mode is 'triangles', so indices have to be a multiple of 3")
     andross.Attachment.initialize(self, name)
     self.vertices = vertices
+    self.weights = weights
     self.indices = indices
+    self.static = false
 
-    self.static = true
-    local boneIndex
-    for i = 1, #vertices do
-        if #weights[i] == 2 then -- vertex only weighed to one bone
-            if boneIndex == nil then
-                boneIndex = weights[i][1]
-            end
-            if weights[i][1] ~= boneIndex then
-                -- not all vertices are bound to the same bone -> non-static -> skinning
-                self.static = false
-                break
+    if weights then
+        self.static = true
+        local boneIndex
+        for i = 1, #vertices do
+            if #weights[i] == 2 then -- vertex only weighed to one bone
+                if boneIndex == nil then
+                    boneIndex = weights[i][1]
+                end
+                if weights[i][1] ~= boneIndex then
+                    -- not all vertices are bound to the same bone -> non-static -> skinning
+                    self.static = false
+                    break
+                end
             end
         end
-    end
-    if self.static then
-        self.realParent = boneIndex
+        if self.static then
+            self.realParent = boneIndex
+        end
     end
 
     -- TODO: GPU skinning?
@@ -130,6 +134,10 @@ end
 
 function backend.AtlasAttachmentManager:getImageAttachment(name)
     return self.imageMap[name]
+end
+
+function backend.AtlasAttachmentManager:getMeshAttachment(name, vertices, weights, indices)
+    return backend.MeshAttachment(name, self.image, vertices, weights, indices)
 end
 
 return backend

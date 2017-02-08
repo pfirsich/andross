@@ -65,18 +65,22 @@ function dragonBones.import(str, attachmentManager)
 
             -- TODO: DragonBones sometimes does not export weights - this case should be handled
             local weights = {}
-            local i = 1
-            while i <= #data.weights do
-                local count = data.weights[i]
-                i = i + 1
-                local vertexWeights = {}
-                for c = 1, count do
-                    -- +1 because of 1-indexing
-                    table.insert(vertexWeights, data.weights[i+0] + 1) -- boneIndex
-                    table.insert(vertexWeights, data.weights[i+1]) -- weight
-                    i = i + 2
+            if data.weights == nil then
+                weights = nil
+            else
+                local i = 1
+                while i <= #data.weights do
+                    local count = data.weights[i]
+                    i = i + 1
+                    local vertexWeights = {}
+                    for c = 1, count do
+                        -- +1 because of 1-indexing
+                        table.insert(vertexWeights, data.weights[i+0] + 1) -- boneIndex
+                        table.insert(vertexWeights, data.weights[i+1]) -- weight
+                        i = i + 2
+                    end
+                    table.insert(weights, vertexWeights)
                 end
-                table.insert(weights, vertexWeights)
             end
 
             local indices = data.triangles
@@ -101,10 +105,12 @@ function dragonBones.import(str, attachmentManager)
             -- COA parents every slot to the Armature itself, not to the bone it's attached to.
             -- So the attachment's transformation are in world space and we have to convert to the bone's space
             local angle = (data.transform.skX or 0) * math.pi/180.0
-            local worldTransform = andross.math.Transform(data.transform.x, data.transform.y,
+            local localTransform = andross.math.Transform(data.transform.x, data.transform.y,
                                                           angle, data.transform.scX, data.transform.scY)
-            local finalTransform = skel.bones[parentBone].worldTransform:inverse():compose(worldTransform)
-            attachment.bindTransform = finalTransform
+            -- first transform to world space by applying the transform of the parent set in the file
+            local worldTransform = skel.bones[jsonArmature.slot[attachmentIndex].parent].worldTransform:compose(localTransform)
+            -- then transform into the space of the parent that we decided on
+            attachment.bindTransform = skel.bones[parentBone].worldTransform:inverse():compose(worldTransform)
             --attachment.positionX, attachment.positionY, attachment.angle, attachment.scaleX, attachment.scaleY = finalTransform:decomposeTRS()
         end
 
