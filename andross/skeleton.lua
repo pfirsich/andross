@@ -23,7 +23,7 @@ function Skeleton:addBone(name, parent, length, positionX, positionY, angle, sca
         worldTransform = {},
 
         length = length or 0,
-        setupTransform = androssMath.Transform(positionX, positionY, angle, scaleX, scaleY),
+        bindTransform = androssMath.Transform(positionX, positionY, angle, scaleX, scaleY),
         positionX = 0,
         positionY = 0,
         angle = 0,
@@ -38,10 +38,10 @@ end
 function Skeleton:updateBone(bone)
     if bone.updateCounter < self.updateCounter then
         local wT = bone.worldTransform
-        bone.worldTransform = bone.setupTransform:compose(androssMath.Transform(bone.positionX, bone.positionY, bone.angle, bone.scaleX, bone.scaleY))
+        bone.worldTransform = bone.bindTransform:compose(androssMath.Transform(bone.positionX, bone.positionY, bone.angle, bone.scaleX, bone.scaleY))
         -- This is so weird. Bone setup pose translations are in world space?! Is this COAs or the format's fault?
-        bone.worldTransform.matrix[5] = bone.setupTransform.matrix[5] + bone.positionX
-        bone.worldTransform.matrix[6] = bone.setupTransform.matrix[6] + bone.positionY
+        bone.worldTransform.matrix[5] = bone.bindTransform.matrix[5] + bone.positionX
+        bone.worldTransform.matrix[6] = bone.bindTransform.matrix[6] + bone.positionY
 
         if bone.parent then
             self:updateBone(bone.parent)
