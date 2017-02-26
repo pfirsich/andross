@@ -33,6 +33,7 @@ function Pose:getPoseValue(type, name, channel)
 end
 
 -- not order dependent!
+-- poseA, weightA, poseB, weightB, poseC, weightC
 function Pose.static:mix(...)
     local ret = Pose()
     local args = {...}
