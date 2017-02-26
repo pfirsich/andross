@@ -10,8 +10,19 @@ function androssMath.normalizeAngle(a)
 end
 
 function androssMath.lerpAngles(a, b, t)
-    local delta = androssMath.normalizeAngle(b - a)
-    return androssMath.normalizeAngle(a + delta * t)
+    --return math.atan2(math.sin(a) * (1 - t) + math.sin(b) * t, math.cos(a) * (1 - t) + math.cos(b) * t)
+    return androssMath.normalizeAngle(a + androssMath.normalizeAngle(b - a) * t)
+end
+
+-- angle, weight, angle, weight, angle, weight...
+function androssMath.blendAngles(angleWeights)
+    local sumX, sumY = 0, 0
+    for i = 1, #angleWeights, 2 do
+        local angle, weight = angleWeights[i+0], angleWeights[i+1]
+        sumX = sumX + math.cos(angle) * weight
+        sumY = sumY + math.sin(angle) * weight
+    end
+    return math.atan2(sumY, sumX)
 end
 
 function androssMath.sign(x)

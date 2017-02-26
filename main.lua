@@ -6,30 +6,42 @@ function love.load(args)
     --mgr = andross.backend.AttachmentManager("media/monstar_arm/sprites/")
     --skel, anims, skin = dragonBones.import(love.filesystem.read("media/monstar_arm/monstar_arm.json"), mgr)
 
-    mgr = andross.backend.AttachmentManager("media/stip/sprites/")
-    skel, anims, skin = dragonBones.import(love.filesystem.read("media/stip/stip.json"), mgr)
+    --mgr = andross.backend.AttachmentManager("media/stip/sprites/")
+    --skel, anims, skin = dragonBones.import(love.filesystem.read("media/stip/stip.json"), mgr)
 
     --mgr = andross.backend.AtlasAttachmentManager("media/db_export/NewDragon_tex.png", dragonBones.importAtlasData(love.filesystem.read("media/db_export/NewDragon_tex.json")))
     --skel, anims, skin = dragonBones.import(love.filesystem.read("media/db_export/NewDragon_ske.json"), mgr)
 
-    --mgr = andross.backend.AttachmentManager("media/dude/dude/sprites")
-    --skel, anims, skin = dragonBones.import(love.filesystem.read("media/dude/dude.json"), mgr)
+    mgr = andross.backend.AttachmentManager("media/dude/texture/sprites/")
+    skel, anims, skin = dragonBones.import(love.filesystem.read("media/dude/dude.json"), mgr)
+    animMgr = andross.AnimationManager(skel, anims)
+    animMgr:play("idle")
+    animMgr:play("running")
 
     scale = 0.2
     animName = args[2]
     print("anim:", animName)
     drawBones = true
+    runWeight = 1
 end
 
-function love.update()
-    local anim = anims["ground_side"] or anims["stand"] or anims["Run"] or anims["Idle"] or anims["Claw"]
+function love.update(dt)
+    if not jumping then
+        runWeight = math.max(0, math.min(1, runWeight))
+        animMgr:setBlendWeight("idle", 1.0 - runWeight)
+        animMgr:setBlendWeight("running", runWeight)
+    end
+
+    animMgr:update(dt)
+
+    local anim = anims["running"] or anims["stand"] or anims["Run"] or anims["Idle"] or anims["Claw"]
     if animName then
         anim = anims[animName]
     end
     local time = love.timer.getTime()
     local pose = anim:getPose(time)
-    pose:apply(skel)
-    skel:update()
+    --pose:apply(skel)
+    --skel:update()
 end
 
 function love.draw()
@@ -76,4 +88,10 @@ function love.keypressed(key)
     if key == "escape" then love.event.push("quit") end
     if key == "space" then drawBones = not drawBones end
     if key == "rctrl" then drawImageMap = not drawImageMap end
+    if key == "up" then runWeight = runWeight + 0.1 end
+    if key == "down" then runWeight = runWeight - 0.1 end
+    if key == "f" then -- pay respects, lul
+        animMgr:fadeIn("jump", 10.0)
+        jumping = true
+    end
 end
