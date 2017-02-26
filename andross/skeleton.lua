@@ -51,6 +51,16 @@ function Skeleton:updateBone(bone)
     end
 end
 
+function Skeleton:reset()
+    for boneIndex, bone in ipairs(self.bones) do
+        bone.positionX = 0
+        bone.positionY = 0
+        bone.angle = 0
+        bone.scaleX = 1
+        bone.scaleY = 1
+    end
+end
+
 function Skeleton:update()
     self.updateCounter = self.updateCounter + 1
     for boneIndex, bone in ipairs(self.bones) do
