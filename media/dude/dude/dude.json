@@ -1,0 +1,411 @@
+{
+    "name": "dude",
+    "nodes": [
+        {
+            "children": [],
+            "frame_index": 0,
+            "name": "UpperLegL.png",
+            "node_path": "UpperLegL.png",
+            "offset": [
+                -512,
+                512
+            ],
+            "opacity": 1.0,
+            "pivot_offset": [
+                0.0,
+                0.0
+            ],
+            "position": [
+                390,
+                550
+            ],
+            "resource_path": "sprites/UpperLegL.png",
+            "rotation": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "tiles_x": 1,
+            "tiles_y": 1,
+            "type": "SPRITE",
+            "z": 0
+        },
+        {
+            "children": [],
+            "frame_index": 0,
+            "name": "LowerLegL.png",
+            "node_path": "LowerLegL.png",
+            "offset": [
+                -512,
+                512
+            ],
+            "opacity": 1.0,
+            "pivot_offset": [
+                0.0,
+                0.0
+            ],
+            "position": [
+                378,
+                723
+            ],
+            "resource_path": "sprites/LowerLegL.png",
+            "rotation": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "tiles_x": 1,
+            "tiles_y": 1,
+            "type": "SPRITE",
+            "z": -1
+        },
+        {
+            "children": [],
+            "frame_index": 0,
+            "name": "UpperLegR.png",
+            "node_path": "UpperLegR.png",
+            "offset": [
+                -512,
+                512
+            ],
+            "opacity": 1.0,
+            "pivot_offset": [
+                0.0,
+                0.0
+            ],
+            "position": [
+                513,
+                546
+            ],
+            "resource_path": "sprites/UpperLegR.png",
+            "rotation": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "tiles_x": 1,
+            "tiles_y": 1,
+            "type": "SPRITE",
+            "z": -2
+        },
+        {
+            "children": [],
+            "frame_index": 0,
+            "name": "LowerLegR.png",
+            "node_path": "LowerLegR.png",
+            "offset": [
+                -512,
+                512
+            ],
+            "opacity": 1.0,
+            "pivot_offset": [
+                0.0,
+                0.0
+            ],
+            "position": [
+                529,
+                699
+            ],
+            "resource_path": "sprites/LowerLegR.png",
+            "rotation": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "tiles_x": 1,
+            "tiles_y": 1,
+            "type": "SPRITE",
+            "z": -3
+        },
+        {
+            "children": [],
+            "frame_index": 0,
+            "name": "HandR.png",
+            "node_path": "HandR.png",
+            "offset": [
+                -512,
+                512
+            ],
+            "opacity": 1.0,
+            "pivot_offset": [
+                0.0,
+                0.0
+            ],
+            "position": [
+                714,
+                573
+            ],
+            "resource_path": "sprites/HandR.png",
+            "rotation": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "tiles_x": 1,
+            "tiles_y": 1,
+            "type": "SPRITE",
+            "z": -4
+        },
+        {
+            "children": [],
+            "frame_index": 0,
+            "name": "HandL.png",
+            "node_path": "HandL.png",
+            "offset": [
+                -512,
+                512
+            ],
+            "opacity": 1.0,
+            "pivot_offset": [
+                0.0,
+                0.0
+            ],
+            "position": [
+                295,
+                618
+            ],
+            "resource_path": "sprites/HandL.png",
+            "rotation": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "tiles_x": 1,
+            "tiles_y": 1,
+            "type": "SPRITE",
+            "z": -5
+        },
+        {
+            "children": [],
+            "frame_index": 0,
+            "name": "LowerArmR.png",
+            "node_path": "LowerArmR.png",
+            "offset": [
+                -512,
+                512
+            ],
+            "opacity": 1.0,
+            "pivot_offset": [
+                0.0,
+                0.0
+            ],
+            "position": [
+                664,
+                391
+            ],
+            "resource_path": "sprites/LowerArmR.png",
+            "rotation": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "tiles_x": 1,
+            "tiles_y": 1,
+            "type": "SPRITE",
+            "z": -6
+        },
+        {
+            "children": [],
+            "frame_index": 0,
+            "name": "LowerArmL.png",
+            "node_path": "LowerArmL.png",
+            "offset": [
+                -512,
+                512
+            ],
+            "opacity": 1.0,
+            "pivot_offset": [
+                0.0,
+                0.0
+            ],
+            "position": [
+                219,
+                415
+            ],
+            "resource_path": "sprites/LowerArmL.png",
+            "rotation": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "tiles_x": 1,
+            "tiles_y": 1,
+            "type": "SPRITE",
+            "z": -7
+        },
+        {
+            "children": [],
+            "frame_index": 0,
+            "name": "UpperArmR.png",
+            "node_path": "UpperArmR.png",
+            "offset": [
+                -512,
+                512
+            ],
+            "opacity": 1.0,
+            "pivot_offset": [
+                0.0,
+                0.0
+            ],
+            "position": [
+                589,
+                207
+            ],
+            "resource_path": "sprites/UpperArmR.png",
+            "rotation": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "tiles_x": 1,
+            "tiles_y": 1,
+            "type": "SPRITE",
+            "z": -8
+        },
+        {
+            "children": [],
+            "frame_index": 0,
+            "name": "UpperArmL.png",
+            "node_path": "UpperArmL.png",
+            "offset": [
+                -512,
+                512
+            ],
+            "opacity": 1.0,
+            "pivot_offset": [
+                0.0,
+                0.0
+            ],
+            "position": [
+                222,
+                210
+            ],
+            "resource_path": "sprites/UpperArmL.png",
+            "rotation": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "tiles_x": 1,
+            "tiles_y": 1,
+            "type": "SPRITE",
+            "z": -9
+        },
+        {
+            "children": [],
+            "frame_index": 0,
+            "name": "Head.png",
+            "node_path": "Head.png",
+            "offset": [
+                -512,
+                512
+            ],
+            "opacity": 1.0,
+            "pivot_offset": [
+                0.0,
+                0.0
+            ],
+            "position": [
+                411,
+                13
+            ],
+            "resource_path": "sprites/Head.png",
+            "rotation": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "tiles_x": 1,
+            "tiles_y": 1,
+            "type": "SPRITE",
+            "z": -10
+        },
+        {
+            "children": [],
+            "frame_index": 0,
+            "name": "Torso.png",
+            "node_path": "Torso.png",
+            "offset": [
+                -512,
+                512
+            ],
+            "opacity": 1.0,
+            "pivot_offset": [
+                0.0,
+                0.0
+            ],
+            "position": [
+                334,
+                187
+            ],
+            "resource_path": "sprites/Torso.png",
+            "rotation": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "tiles_x": 1,
+            "tiles_y": 1,
+            "type": "SPRITE",
+            "z": -11
+        },
+        {
+            "children": [],
+            "frame_index": 0,
+            "name": "FootR.png",
+            "node_path": "FootR.png",
+            "offset": [
+                -512,
+                512
+            ],
+            "opacity": 1.0,
+            "pivot_offset": [
+                0.0,
+                0.0
+            ],
+            "position": [
+                511,
+                885
+            ],
+            "resource_path": "sprites/FootR.png",
+            "rotation": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "tiles_x": 1,
+            "tiles_y": 1,
+            "type": "SPRITE",
+            "z": -12
+        },
+        {
+            "children": [],
+            "frame_index": 0,
+            "name": "FootL.png",
+            "node_path": "FootL.png",
+            "offset": [
+                -512,
+                512
+            ],
+            "opacity": 1.0,
+            "pivot_offset": [
+                0.0,
+                0.0
+            ],
+            "position": [
+                349,
+                870
+            ],
+            "resource_path": "sprites/FootL.png",
+            "rotation": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "tiles_x": 1,
+            "tiles_y": 1,
+            "type": "SPRITE",
+            "z": -13
+        }
+    ]
+}
