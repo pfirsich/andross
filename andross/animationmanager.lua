@@ -3,8 +3,7 @@ local Pose = require "andross.Pose"
 
 local AnimationManager = class("AnimationManager")
 
--- later take a skin as an additional parameter for slot animations?
-function AnimationManager:initialize(skeleton, animations)
+function AnimationManager:initialize(skeleton, animations, skin)
     self.skeleton = skeleton
     self.skin = skin
     self.animationStates = {}
@@ -215,9 +214,16 @@ function AnimationManager:update(dt)
         end
     end
 
+    self.currentPose = pose
+end
+
+function AnimationManager:render()
     self.skeleton:reset()
-    pose:apply(self.skeleton)
+    if self.currentPose then
+        self.currentPose:apply(self.skeleton)
+    end
     self.skeleton:update()
+    self.skin:render(self.skeleton)
 end
 
 return AnimationManager

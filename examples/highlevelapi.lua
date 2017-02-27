@@ -5,8 +5,8 @@ dragonBones = require "andross.dragonbones"
 function love.load(args)
     --mgr = andross.backend.AttachmentManager("media/dude/dude/sprites/")
     local attachmentMgr = andross.backend.AtlasAttachmentManager("media/dude/texture/sprites/dude_atlas.png")
-    skel, anims, skin = dragonBones.import(love.filesystem.read("media/dude/dude.json"), attachmentMgr)
-    animMgr = andross.AnimationManager(skel, anims)
+    local skel, anims, skin = dragonBones.import(love.filesystem.read("media/dude/dude.json"), attachmentMgr)
+    animMgr = andross.AnimationManager(skel, anims, skin)
 
     animMgr:setLooping("jump", false)
 
@@ -91,7 +91,7 @@ function love.draw()
         lg.rectangle("fill", -groundSize/2, 0, groundSize, groundSize)
 
         lg.translate(0, height)
-        skin:render(skel)
+        animMgr:render()
 
         if drawBones then
             andross.backend.debugDrawBones(skel)
