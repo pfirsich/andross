@@ -59,7 +59,7 @@ function Pose.static:mix(...)
                         local angleDirX, angleDirY = math.cos(channelValue), math.sin(channelValue)
                         ret.values[typeName][objName]["angleDirX"] = (ret.values[typeName][objName]["angleDirX"] or 0) + angleDirX * weight
                         ret.values[typeName][objName]["angleDirY"] = (ret.values[typeName][objName]["angleDirY"] or 0) + angleDirY * weight
-                        ret.values[typeName][objName]["angleCount"] = (ret.values[typeName][objName]["angleCount"] or 0) + 1
+                        ret.values[typeName][objName]["angleWeightSum"] = (ret.values[typeName][objName]["angleWeightSum"] or 0) + weight
                     end
                 end
             end
@@ -70,12 +70,13 @@ function Pose.static:mix(...)
             for objName, obj in pairs(objType) do
                 for channelName, channelValue in pairs(obj) do
                     if channelName == "angle" then
-                        -- if we only have one angle, just take angle * weight (which we did earlier, so do nothing)
-                        if ret.values[typeName][objName]["angleCount"] > 1 then
-                            ret:setPoseValue(typeName, objName, channelName,
+                        -- We multiply by the weight sum, so that if we only have one angle with weight 0.1, we don't get the full direction
+                        -- also if we have any number of angles at any weight > 0, we get their average.
+                        -- conceptually I understand this as atan2(sum[math.sin(angle_i)], sum[math.cos(angle_i)]) being the weighted average
+                        -- already divided by the weight sum, and we multiply it again, to only get the weighted sum
+                        ret:setPoseValue(typeName, objName, channelName,
                                 math.atan2(ret.values[typeName][objName]["angleDirY"],
-                                           ret.values[typeName][objName]["angleDirX"]))
-                        end
+                                           ret.values[typeName][objName]["angleDirX"]) * ret.values[typeName][objName]["angleWeightSum"])
                     end
                 end
             end
