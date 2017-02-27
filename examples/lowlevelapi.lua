@@ -5,8 +5,9 @@ dragonBones = require "andross.dragonbones"
 -- excuse all the globals and such, but I just want to get this out there and don't think at all if possible
 
 function love.load(args)
-    mgr = andross.backend.AttachmentManager("media/dude/dude/sprites/")
-    skel, anims, skin = dragonBones.import(love.filesystem.read("media/dude/dude.json"), mgr)
+    --local attachmentMgr = andross.backend.AttachmentManager("media/dude/dude/sprites/")
+    local attachmentMgr = andross.backend.AtlasAttachmentManager("media/dude/texture/sprites/dude_atlas.png")
+    skel, anims, skin = dragonBones.import(love.filesystem.read("media/dude/dude.json"), attachmentMgr)
 
     animNameList = {}
     currentAnimationNameIndex = 1
