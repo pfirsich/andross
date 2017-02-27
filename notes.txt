@@ -1,3 +1,5 @@
+# This document is not at all up to date in regards do my current knowledge of the file format
+
 armature: # only one, in every project
 	frameRate
 	name

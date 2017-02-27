@@ -1,0 +1,8 @@
+* Example for using the API without an importer
+* Make a better notes.txt on the DragonBones format
+* Test layers in AnimationManager (probably hopefully kind of implemented already)
+* Skinning
+* Importing actual DragonBones files correctly and not just coa tools exports
+* A better high-level animation system, that is not something I pulled out of my ass without having ever built or USED one before?
+* Curves (only relevant for DragonBones)
+* Find a better way to handle the 'if channelName == "angle"'-stuff
