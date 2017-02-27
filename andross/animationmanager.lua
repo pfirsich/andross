@@ -69,17 +69,17 @@ function AnimationManager:isFinished(name)
     return not self.animationStates[name].playing and self.animationStates[name].time >= self.animationStates[name].animation.duration
 end
 
--- makes sure the weight of the animation <name> is increased to 1.0 in duration seconds
+-- makes sure the weight of the animation <name> is increased to targetWeight in duration seconds
 -- also decreases all other weights on the same layer to zero in the same amount of time
 -- it's easy to show that the relative weight of all the decreasing weight animations
 -- stays the same for the whole fade
 -- obviously this is not the case for the animation faded in
-function AnimationManager:fadeInEx(name, duration) -- Ex = "exclusive"
+function AnimationManager:fadeInEx(name, duration, targetWeight) -- Ex = "exclusive"
     local layer = self.layers[self.animationStates[name].layer]
     for otherName, anim in pairs(layer.animations) do
         self:fadeOut(otherName, duration)
     end
-    self:fadeIn(name, duration)
+    self:fadeIn(name, duration, targetWeight)
     self:play(name, self.animationStates[name].blendWeight)
 end
 
