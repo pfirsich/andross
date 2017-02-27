@@ -33,7 +33,7 @@ function Pose:getPoseValue(type, name, channel)
 end
 
 -- not order dependent!
--- poseA, weightA, poseB, weightB, poseC, weightC
+-- poseA, weightA, poseB, weightB, poseC, weightC, ...
 function Pose.static:mix(...)
     local ret = Pose()
     local args = {...}
@@ -45,13 +45,21 @@ function Pose.static:mix(...)
                 for channelName, channelValue in pairs(obj) do
                     -- if you need other default values for your custom animated channels, see top
                     local value = ret:getPoseValue(typeName, objName, channelName) or 0
-                    value = value + channelValue * weight
+
+                    -- this seems weird too
+                    if channelDefaults[channelName] then
+                        value = value + (channelValue - channelDefaults[channelName]) * weight
+                    else
+                        value = value + channelValue * weight
+                    end
+
                     ret:setPoseValue(typeName, objName, channelName, value)
 
                     if channelName == "angle" then -- so ugly
                         local angleDirX, angleDirY = math.cos(channelValue), math.sin(channelValue)
                         ret.values[typeName][objName]["angleDirX"] = (ret.values[typeName][objName]["angleDirX"] or 0) + angleDirX * weight
                         ret.values[typeName][objName]["angleDirY"] = (ret.values[typeName][objName]["angleDirY"] or 0) + angleDirY * weight
+                        ret.values[typeName][objName]["angleCount"] = (ret.values[typeName][objName]["angleCount"] or 0) + 1
                     end
                 end
             end
@@ -62,9 +70,12 @@ function Pose.static:mix(...)
             for objName, obj in pairs(objType) do
                 for channelName, channelValue in pairs(obj) do
                     if channelName == "angle" then
-                        ret:setPoseValue(typeName, objName, channelName,
-                            math.atan2(ret.values[typeName][objName]["angleDirY"],
-                                       ret.values[typeName][objName]["angleDirX"]))
+                        -- if we only have one angle, just take angle * weight (which we did earlier, so do nothing)
+                        if ret.values[typeName][objName]["angleCount"] > 1 then
+                            ret:setPoseValue(typeName, objName, channelName,
+                                math.atan2(ret.values[typeName][objName]["angleDirY"],
+                                           ret.values[typeName][objName]["angleDirX"]))
+                        end
                     end
                 end
             end
