@@ -52,9 +52,22 @@ function AnimationManager:setBlendWeight(name, blendWeight)
     self.animationStates[name].blendWeight = math.min(math.max(blendWeight, 0.0), 1.0)
 end
 
-function AnimationManager:play(name, startTime)
+function AnimationManager:getBlendWeight(name)
+    return self.animationStates[name].blendWeight
+end
+
+function AnimationManager:play(name, weight, startTime)
     self.animationStates[name].time = startTime or 0
+    self.animationStates[name].blendWeight = weight or 1
     self.animationStates[name].playing = true
+end
+
+function AnimationManager:isPlaying(name)
+    return self.animationStates[name].playing
+end
+
+function AnimationManager:isFinished(name)
+    return not self.animationStates[name].playing and self.animationStates[name].time >= self.animationStates[name].animation.duration
 end
 
 -- makes sure the weight of the animation <name> is increased to 1.0 in duration seconds
@@ -62,14 +75,43 @@ end
 -- it's easy to show that the relative weight of all the decreasing weight animations
 -- stays the same for the whole fade
 -- obviously this is not the case for the animation faded in
-function AnimationManager:fadeIn(name, duration)
+function AnimationManager:fadeInEx(name, duration) -- Ex = "exclusive"
     local layer = self.layers[self.animationStates[name].layer]
-    for name, anim in pairs(layer.animations) do
-        anim.weightSpeed = (0.0 - anim.blendWeight) / duration
+    for otherName, anim in pairs(layer.animations) do
+        self:fadeOut(otherName, duration)
     end
+    self:fadeIn(name, duration)
+    self:play(name, self.animationStates[name].blendWeight)
+end
+
+function AnimationManager:fade(name, duration, targetWeight)
     local anim = self.animationStates[name]
-    anim.weightSpeed = (1.0 - anim.blendWeight) / duration
-    self:play(name)
+    anim.weightSpeed = (targetWeight - anim.blendWeight) / duration
+    anim.targetWeight = targetWeight
+end
+
+function AnimationManager:fadeIn(name, duration)
+    self:fade(name, duration, 1.0)
+end
+
+function AnimationManager:fadeOut(name, duration)
+    self:fade(name, duration, 0.0)
+end
+
+-- These things only exist if you want to manage animations as a group
+-- then you can just fade your group in and multiply it with your sub-weights
+-- also you can fade in something else and the group get's faded out.
+-- This is essentially just a mock animation that has a weight than can be animated and
+-- will be animated by fadeInEx (if called for other animations)
+-- see examples/highlevelapi.lua to see how it can be used
+function AnimationManager:addAnimationGroup(name)
+    self.animationStates[name] = {
+        animation = nil,
+        blendWeight = 0.0,
+        layer = 1,
+        weightSpeed = 0,
+    }
+    self.layers[1].animations[name] = self.animationStates[name]
 end
 
 function AnimationManager:getState(name)
@@ -109,7 +151,6 @@ function AnimationManager:setLayerAlpha(layer, alpha)
     end
 end
 
-
 function AnimationManager:update(dt)
     local pose = nil
 
@@ -120,13 +161,13 @@ function AnimationManager:update(dt)
         local mixParams = {}
         for name, animState in pairs(layer.animations) do
             local anim = animState.animation
-            if animState.playing then
+            if animState.playing and anim then
                 local oldTime = animState.time
                 local time = oldTime + dt * animState.speed
 
                 -- callbacks
                 for _, cb in ipairs(animState.callbacks) do
-                    if oldTime < cb.time and time > cb.time then
+                    if oldTime < cb.time and time >= cb.time then
                         cb.callback(self, anim.name)
                     end
                 end
@@ -141,19 +182,28 @@ function AnimationManager:update(dt)
                     end
                 end
                 animState.time = time
+            end
 
-                -- animate weights
-                -- NOTE: you can not set a nonzero weight speed for a weight > 1 or < 0
+            -- animate weights
+            -- NOTE: you can not set a nonzero weight speed for a weight > 1 or < 0
+            if math.abs(animState.weightSpeed) > 0 then
+                local preDiff = animState.blendWeight - animState.targetWeight
                 animState.blendWeight = animState.blendWeight + animState.weightSpeed * dt
-                if animState.blendWeight > 1.0 or animState.blendWeight < 0.0 then
-                    animState.blendWeight = math.max(0, math.min(1, animState.blendWeight))
-                    animState.weightSpeed = 0.0
+                animState.blendWeight = math.max(0, math.min(1, animState.blendWeight))
+
+                local postDiff = animState.blendWeight - animState.targetWeight
+                if preDiff * postDiff <= 0 then
+                    animState.blendWeight = animState.targetWeight
+                    animState.weightSpeed = 0
                 end
             end
 
-            local pose = anim:getPose(animState.time)
-            table.insert(mixParams, pose)
-            table.insert(mixParams, animState.blendWeight)
+            if animState.blendWeight > 0 and anim then
+                local pose = anim:getPose(animState.time)
+                table.insert(mixParams, pose)
+                table.insert(mixParams, animState.blendWeight)
+                --print(anim.name, animState.blendWeight)
+            end
         end
 
         layer._pose = Pose.static:mix(unpack(mixParams))
@@ -165,6 +215,7 @@ function AnimationManager:update(dt)
         end
     end
 
+    self.skeleton:reset()
     pose:apply(self.skeleton)
     self.skeleton:update()
 end
