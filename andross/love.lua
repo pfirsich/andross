@@ -36,7 +36,6 @@ function backend.ImageAttachment:draw(skeleton)
     end
 
     -- draw
-    lg.setColor(255, 255, 255, 255)
     if self.quad then
         lg.draw(self.image, self.quad, self.positionX, self.positionY, self.angle, self.scaleX, self.scaleY)
     else
@@ -98,7 +97,6 @@ function backend.MeshAttachment:draw(skeleton)
     end
 
     -- draw
-    lg.setColor(255, 255, 255, 255)
     lg.draw(self.mesh, self.positionX, self.positionY, self.angle, self.scaleX, self.scaleY)
 
     lg.pop()
