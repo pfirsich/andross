@@ -32,7 +32,10 @@ function Animation:addKeyframe(time, keyframeType, name, channel, value, curve)
 end
 
 function Animation:getPose(time, keyframeType, name, channel)
-    time = time % self.duration
+    -- I do this so that the last keyframe is chosen if time = duration, so that
+    -- non-looping animations that reached the end don't wrap around
+    local eps = 1e-5
+    time = ((time - eps) % self.duration) + eps
 
     local pose = Pose()
     for _keyframeTypeName, _keyframeType in pairs(self.keyframes) do
