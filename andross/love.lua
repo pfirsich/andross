@@ -79,7 +79,7 @@ function backend.MeshAttachment:initialize(name, image, vertices, weights, indic
         end
     end
 
-    -- TODO: GPU skinning?
+    -- TODO: Skinning?
     self.mesh = love.graphics.newMesh(vertices, "triangles", self.static and "static" or "stream")
     self.mesh:setVertexMap(indices)
     self.mesh:setTexture(image)
@@ -121,14 +121,17 @@ end
 backend.AtlasAttachmentManager = class("AtlasAttachmentManager")
 
 -- atlasData = list of {x = .., y = .., width = .., height = .., name = ..}
+-- if you don't have ImageAttachments on your skeleton, you don't need atlasData
 function backend.AtlasAttachmentManager:initialize(imagePath, atlasData)
     self.image = love.graphics.newImage(imagePath)
     self.imageMap = {}
 
-    local iW, iH = self.image:getDimensions()
-    for _, image in ipairs(atlasData) do
-        local quad = love.graphics.newQuad(image.x, image.y, image.width, image.height, iW, iH)
-        self.imageMap[image.name] = backend.ImageAttachment(image.name, self.image, quad)
+    if atlasData then
+        local iW, iH = self.image:getDimensions()
+        for _, image in ipairs(atlasData) do
+            local quad = love.graphics.newQuad(image.x, image.y, image.width, image.height, iW, iH)
+            self.imageMap[image.name] = backend.ImageAttachment(image.name, self.image, quad)
+        end
     end
 end
 
