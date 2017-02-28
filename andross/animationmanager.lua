@@ -79,7 +79,7 @@ function AnimationManager:fadeInEx(name, duration, targetWeight) -- Ex = "exclus
     for otherName, anim in pairs(layer.animations) do
         self:fadeOut(otherName, duration)
     end
-    self:fadeIn(name, duration, targetWeight)
+    self:fade(name, duration, targetWeight or 1.0)
     self:play(name, self.animationStates[name].blendWeight)
 end
 

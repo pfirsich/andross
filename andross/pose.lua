@@ -27,9 +27,15 @@ end
 
 function Pose:getPoseValue(type, name, channel)
     if not self.values[type] or not self.values[type][name] then
-        return nil
+        return channelDefaults[channel]
     end
-    return self.values[type][name][channel]
+
+    local ret = self.values[type][name][channel]
+    if ret == nil then
+        return channelDefaults[channel]
+    else
+        return ret
+    end
 end
 
 -- not order dependent!
