@@ -10,10 +10,10 @@ function love.load(args)
 
     animMgr:setLooping("jump", false)
 
-    animMgr:setLooping("landing", false)
-    animMgr:setSpeed("landing", anims["landing"].duration/0.5)
-    animMgr:setCallback("landing", anims["landing"].duration, function()
-        animMgr:fadeOut("landing", 0.2)
+    animMgr:setLooping("land", false)
+    animMgr:setSpeed("land", anims["land"].duration/0.5)
+    animMgr:setCallback("land", anims["land"].duration, function()
+        animMgr:fadeOut("land", 0.2)
     end)
 
     animMgr:play("idle")
@@ -51,23 +51,21 @@ function love.update(dt)
     velocityX = math.min(maxSpeed, velocityX)
 
     -- gravity
-    local lastVelocityY = velocityY
     velocityY = velocityY + 1000 * dt
-    local lastHeight = height
-    local lastOnGround = lastHeight == 0
     height = math.min(0, height + velocityY * dt)
     local onGround = height == 0
+    if onGround then velocityY = 0 end
 
     -- Animation
     local runWeight = math.abs(velocityX / maxSpeed)
     local idleWeight = 1.0 - runWeight
 
-    if lastVelocityY < 0 and velocityY > 0 then
-        animMgr:fadeInEx("fall", 0.3)
+    if velocityY > 0 and animMgr:getBlendWeight("falling") <= 0 then
+        animMgr:fadeInEx("falling", 0.3)
     end
 
-    if onGround and not lastOnGround then
-        animMgr:fadeInEx("landing", 0.1)
+    if onGround and animMgr:getBlendWeight("idleRun") <= 0 then
+        animMgr:fadeInEx("land", 0.1)
         animMgr:fadeIn("idleRun", 0.6)
     end
 
@@ -91,10 +89,11 @@ function love.draw()
         lg.rectangle("fill", -groundSize/2, 0, groundSize, groundSize)
 
         lg.translate(0, height)
+        lg.setColor(255, 255, 255, 255)
         animMgr:render()
 
         if drawBones then
-            andross.backend.debugDrawBones(skel)
+            andross.backend.debugDrawBones(animMgr.skeleton)
         end
     lg.pop()
     lg.print("Left/Right to run, space to jump", 5, 5)
