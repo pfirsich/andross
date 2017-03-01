@@ -1,5 +1,5 @@
 local class = require "andross.middleclass"
-local Pose = require "andross.Pose"
+local Pose = require "andross.pose"
 
 local AnimationManager = class("AnimationManager")
 

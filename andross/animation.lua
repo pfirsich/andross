@@ -1,6 +1,6 @@
 local class = require "andross.middleclass"
 local androssMath = require "andross.math"
-local Pose = require "andross.Pose"
+local Pose = require "andross.pose"
 
 local Animation = class("Animation")
 
