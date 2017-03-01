@@ -221,13 +221,30 @@ function AnimationManager:update(dt)
     self.currentPose = pose
 end
 
-function AnimationManager:render()
+function AnimationManager:updateSkeleton()
+    self.skeleton:update()
+end
+
+function AnimationManager:poseSkeleton(updateSkeleton)
+    if updateSkeleton == nil then updateSkeleton = true end
+
     self.skeleton:reset()
     if self.currentPose then
         self.currentPose:apply(self.skeleton)
     end
-    self.skeleton:update()
+
+    if updateSkeleton then
+        self.skeleton:update()
+    end
+end
+
+function AnimationManager:render()
     self.skin:render(self.skeleton)
+end
+
+function AnimationManager:poseAndRender()
+    self:poseSkeleton(true)
+    self:render()
 end
 
 return AnimationManager

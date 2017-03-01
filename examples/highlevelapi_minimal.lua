@@ -21,6 +21,6 @@ function love.draw()
         local scale = 0.5
         lg.scale(scale, scale)
 
-        animMgr:render()
+        animMgr:poseAndRender()
     lg.pop()
 end

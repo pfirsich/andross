@@ -90,7 +90,7 @@ function love.draw()
 
         lg.translate(0, height)
         lg.setColor(255, 255, 255, 255)
-        animMgr:render()
+        animMgr:poseAndRender()
 
         if drawBones then
             andross.backend.debugDrawBones(animMgr.skeleton)
