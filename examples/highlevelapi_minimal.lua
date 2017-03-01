@@ -7,7 +7,7 @@ function love.load(args)
     local skel, anims, skin = dragonBones.import(love.filesystem.read("media/dude/dude.json"), attachmentMgr)
 
     animMgr = andross.AnimationManager(skel, anims, skin)
-    animMgr:play("running")
+    animMgr:play("running", 1.0)
 end
 
 function love.update(dt)

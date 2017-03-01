@@ -56,9 +56,13 @@ function AnimationManager:getBlendWeight(name)
 end
 
 function AnimationManager:play(name, weight, startTime)
-    self.animationStates[name].time = startTime or 0
-    self.animationStates[name].blendWeight = weight or 1
     self.animationStates[name].playing = true
+    if weight then self.animationStates[name].blendWeight = weight end
+    self.animationStates[name].time = startTime or 0
+end
+
+function AnimationManager:stop(name)
+    self.animationStates[name].playing = false
 end
 
 function AnimationManager:isPlaying(name)
@@ -80,7 +84,7 @@ function AnimationManager:fadeInEx(name, duration, targetWeight) -- Ex = "exclus
         self:fadeOut(otherName, duration)
     end
     self:fade(name, duration, targetWeight or 1.0)
-    self:play(name, self.animationStates[name].blendWeight)
+    self:play(name)
 end
 
 function AnimationManager:fade(name, duration, targetWeight)
