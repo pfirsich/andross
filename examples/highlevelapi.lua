@@ -25,6 +25,7 @@ function love.load(args)
     velocityY = 0
     height = 0
 
+    scale = 0.4
     drawBones = false
 end
 
@@ -79,7 +80,6 @@ function love.draw()
     local lg = love.graphics
     lg.push()
         lg.translate(lg.getWidth()/2, lg.getHeight()/2)
-        local scale = 0.4
         local scaleX = 1.0
         if velocityX < 0 then scaleX = -1.0 end
         lg.scale(scale * scaleX, scale)
