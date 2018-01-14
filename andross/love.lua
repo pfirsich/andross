@@ -141,14 +141,14 @@ function backend.AtlasAttachmentManager:getMeshAttachment(name, vertices, weight
     return backend.MeshAttachment(name, self.image, vertices, weights, indices)
 end
 
-function backend.debugDrawBones(skeleton)
+function backend.debugDrawBones(skeleton, boneThickness, borderThickness)
     local lg = love.graphics
+    boneThickness = boneThickness or 40
+    borderThickness = borderThickness or 5
 
     for _, bone in ipairs(skeleton.bones) do
         lg.push()
         lg.multiplyMatrix(bone.worldTransform.matrix)
-        local boneThickness = 40
-        local borderThickness = 5
         lg.setColor(255, 255, 255, 255)
         lg.rectangle("fill", 0, -boneThickness/2, bone.length, boneThickness)
         lg.setColor(0, 0, 0, 255)
