@@ -48,8 +48,8 @@ end
 backend.MeshAttachment = class("MeshAttachment", andross.Attachment)
 
 -- vertices are a list of {x, y, u, v}
--- weights are a list of {boneIndex1, weight1, boneIndex2, weight2, ...} for each vertex
--- indices are one-based, boneIndices obviously too!
+-- weights are a list of {boneName1, weight1, boneName2, weight2, ...} for each vertex
+-- indices are one-based!
 function backend.MeshAttachment:initialize(name, image, vertices, weights, indices)
     assert(#indices % 3 == 0, "Draw mode is 'triangles', so indices have to be a multiple of 3")
     andross.Attachment.initialize(self, name)
@@ -88,12 +88,39 @@ function backend.MeshAttachment:draw(skeleton)
     local lg = love.graphics
     lg.push()
 
-    -- apply bone transform
-    local bone = skeleton.bones[self.parentBoneName]
-    lg.multiplyMatrix(bone.worldTransform.matrix)
+    if self.static then
+        -- apply bone transform
+        local bone = skeleton.bones[self.parentBoneName]
+        lg.multiplyMatrix(bone.worldTransform.matrix)
 
-    if self.bindTransform then
-        lg.multiplyMatrix(self.bindTransform.matrix)
+        if self.bindTransform then
+            lg.multiplyMatrix(self.bindTransform.matrix)
+        end
+    else -- skinning
+        local trafoCache = {}
+
+        local skinnedVerts = {}
+        for i, v in ipairs(self.vertices) do
+            local x, y, u, v = unpack(v)
+            local trafo = androssMath.Transform()
+            trafo.matrix = {0, 0, 0, 0, 0, 0}
+
+            local weights = self.weights[i]
+            for i = 1, #weights, 2 do
+                local boneName = weights[i+0]
+                local weight = weights[i+1]
+                local otherTrafo = trafoCache[boneName]
+                if otherTrafo == nil then
+                    otherTrafo = skeleton.bones[boneName].worldTransform:compose(self.bindTransform)
+                    trafoCache[boneName] = otherTrafo
+                end
+                trafo:add(otherTrafo, weight)
+            end
+
+            x, y = trafo:applyPoint(x, y)
+            table.insert(skinnedVerts, {x, y, u, v})
+        end
+        self.mesh:setVertices(skinnedVerts)
     end
 
     -- draw

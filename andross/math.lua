@@ -127,4 +127,18 @@ function androssMath.Transform:decomposeTRS()
     return x, y, angle, sX, sY
 end
 
+function androssMath.Transform:applyPoint(x, y, w)
+    w = w or 1
+    local a, b, c, d, tx, ty = unpack(self.matrix)
+    return a*x + b*y + tx*w,
+           c*x + d*y + ty*w
+end
+
+function androssMath.Transform:add(other, factor)
+    factor = factor or 1
+    for i = 1, 6 do
+        self.matrix[i] = self.matrix[i] + other.matrix[i] * factor
+    end
+end
+
 return androssMath

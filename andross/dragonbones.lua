@@ -21,12 +21,14 @@ function dragonBones.import(str, attachmentManager)
 
     -- Skeleton
     local skel = andross.Skeleton()
+    local boneIndexNameMap = {}
     for boneIndex, bone in ipairs(jsonArmature.bone) do
         local angle = bone.transform.skX
         if angle then angle = angle * math.pi / 180.0 end
         skel:addBone(bone.name, bone.parent, bone.length,
                      bone.transform.x, bone.transform.y, angle,
                      bone.transform.scX, bone.transform.scY)
+        boneIndexNameMap[boneIndex] = bone.name
     end
     skel:update()
 
@@ -77,7 +79,7 @@ function dragonBones.import(str, attachmentManager)
                         local vertexWeights = {}
                         for c = 1, count do
                             -- +1 because of 1-indexing
-                            table.insert(vertexWeights, data.weights[i+0] + 1) -- boneIndex
+                            table.insert(vertexWeights, boneIndexNameMap[data.weights[i+0] + 1]) -- boneIndex
                             table.insert(vertexWeights, data.weights[i+1]) -- weight
                             i = i + 2
                         end
