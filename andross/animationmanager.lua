@@ -14,11 +14,12 @@ function AnimationManager:initialize(skeleton, animations, skin)
             time = 0.0,
             speed = 1.0,
             playing = false,
-            looping = true,
+            loopPoint = 0, -- the frame to loop to
             callbacks = {},
             blendWeight = 0.0,
             layer = 1,
             weightSpeed = 0,
+            range = anim.duration,
         }
         self.layers[1].animations[anim.name] = self.animationStates[anim.name]
     end
@@ -39,12 +40,30 @@ function AnimationManager:setSpeed(name, speed)
     self.animationStates[name].speed = speed
 end
 
+function AnimationManager:setDuration(name, duration, range, start)
+    start = start or self.animationStates[name].time
+    range = range or self.animationStates[name].range
+    self.animationStates[name].speed = (range - start) / duration
+end
+
 function AnimationManager:setTime(name, time)
     self.animationStates[name].time = time
 end
 
-function AnimationManager:setLooping(name, looping)
-    self.animationStates[name].looping = looping
+function AnimationManager:setLooping(name, loopPoint)
+    if type(loopPoint) == "boolean" then
+        if loopPoint then
+            self.animationStates[name].loopPoint = 0
+        else
+            self.animationStates[name].loopPoint = nil
+        end
+    else
+        self.animationStates[name].loopPoint = loopPoint
+    end
+end
+
+function AnimationManager:setRange(name, range)
+    self.animationStates[name].range = range
 end
 
 function AnimationManager:setBlendWeight(name, blendWeight)
@@ -176,11 +195,11 @@ function AnimationManager:update(dt)
                 end
 
                 -- looping
-                if time > anim.duration then
-                    if animState.looping then
-                        time = time % anim.duration
+                if time > animState.range then
+                    if animState.loopPoint then
+                        time = time % animState.range + animState.loopPoint
                     else
-                        time = anim.duration
+                        time = animState.range
                         animState.playing = false
                     end
                 end
