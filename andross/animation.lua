@@ -46,7 +46,7 @@ function Animation:getPose(time, keyframeType, name, channel)
             for _name, _keyframeField in pairs(_keyframeType) do
                 if name == nil or _name == name then
                     for _channelName, _channel in pairs(_keyframeField) do
-                        if channelName == nil or _channelName == channel then
+                        if channel == nil or _channelName == channel then
                             if time <= _channel[1].time then -- before first keyframe
                                 pose:setPoseValue(_keyframeTypeName, _name, _channelName, _channel[1].value)
                             elseif time >= _channel[#_channel].time then -- after last keyframe
