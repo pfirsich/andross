@@ -29,6 +29,10 @@ function AnimationManager:initialize(skeleton, animations, skin)
     self.layerList = {1}
 end
 
+function AnimationManager:getAnimation(name)
+    return self.animationStates[name].animation
+end
+
 -- This functionality should be improved. I have never used something like this before, so I
 -- don't really know it's use cases and caveats, but I know there should probably be a way to
 -- disable/remove callbacks afterwards
@@ -112,8 +116,8 @@ function AnimationManager:fade(name, duration, targetWeight)
     anim.targetWeight = targetWeight
 end
 
-function AnimationManager:fadeIn(name, duration)
-    self:fade(name, duration, 1.0)
+function AnimationManager:fadeIn(name, duration, targetWeight)
+    self:fade(name, duration, targetWeight or 1.0)
 end
 
 function AnimationManager:fadeOut(name, duration)
