@@ -180,10 +180,12 @@ end
 function AnimationManager:update(dt)
     local pose = nil
 
-    local layerMixParams = {}
+    --local layerMixParams = {}
     for _, layerId in ipairs(self.layerList) do
         local layer = self.layers[layerId]
 
+        -- consider reusing this table, so far no difference can be measured between
+        -- this and a static (module-local) mixParams
         local mixParams = {}
         for name, animState in pairs(layer.animations) do
             local anim = animState.animation

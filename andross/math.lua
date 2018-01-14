@@ -38,38 +38,62 @@ end
 androssMath.Transform = class("Transform")
 
 function androssMath.Transform:initialize(x, y, angle, scaleX, scaleY)
-    if type(x) == "table" then
-        self.matrix = x
-    else
-        angle = angle or 0
-        scaleX = scaleX or 1
-        scaleY = scaleY or 1
-        -- a matrix is {a, b, c, d, t_x, t_y}
-        -- short for a homogeneous transform in 2D:
-        -- a   b   t_x
-        -- c   d   t_y
-        -- 0   0   1
+    self.matrix = {}
 
-        local c, s = math.cos(angle), math.sin(angle)
-        self.matrix = {
-            scaleX * c, scaleY * -s,
-            scaleX * s, scaleY * c,
-            x or 0, y or 0
-        }
+    if type(x) == "table" then
+        for i = 1, #x do
+            self.matrix[i] = x[i]
+        end
+    else
+        self:set(x, y, angle, scaleX, scaleY)
     end
 end
 
--- multiplies the matrix of another transform to the right and returns the result
+function androssMath.Transform:set(x, y, angle, scaleX, scaleY)
+    angle = angle or 0
+    scaleX = scaleX or 1
+    scaleY = scaleY or 1
+
+    -- a matrix is {a, b, c, d, t_x, t_y}
+    -- short for a homogeneous transform in 2D:
+    -- a   b   t_x
+    -- c   d   t_y
+    -- 0   0   1
+    local c, s = math.cos(angle), math.sin(angle)
+    self.matrix[1], self.matrix[2] = scaleX * c, scaleY * -s
+    self.matrix[3], self.matrix[4] = scaleX * s, scaleY * c
+    self.matrix[5], self.matrix[6] = x or 0, y or 0
+end
+
+function androssMath.Transform:copy()
+    local ret = androssMath.Transform()
+    for i, comp in ipairs(self.matrix) do
+        ret.matrix[i] = comp
+    end
+    return ret
+end
+
+local function matrixMul(a, b)
+    return  a[1]*b[1] + a[2]*b[3], -- a*a'+b*c'
+            a[1]*b[2] + a[2]*b[4], -- a*b'+b*d'
+            a[3]*b[1] + a[4]*b[3], -- c*a'+d*c'
+            a[3]*b[2] + a[4]*b[4], -- c*b'+d*d'
+            a[1]*b[5] + a[2]*b[6] + a[5], -- a*t_x'+b*t_y'+t_x
+            a[3]*b[5] + a[4]*b[6] + a[6] -- c*t_x'+d*t_y'+t_y
+end
+
+-- multiplies the matrix of another transform from the right and returns the result
 function androssMath.Transform:compose(other)
-    local a, b = self.matrix, other.matrix
-    return androssMath.Transform({
-        a[1]*b[1] + a[2]*b[3], -- a*a'+b*c'
-        a[1]*b[2] + a[2]*b[4], -- a*b'+b*d'
-        a[3]*b[1] + a[4]*b[3], -- c*a'+d*c'
-        a[3]*b[2] + a[4]*b[4], -- c*b'+d*d'
-        a[1]*b[5] + a[2]*b[6] + a[5], -- a*t_x'+b*t_y'+t_x
-        a[3]*b[5] + a[4]*b[6] + a[6], -- c*t_x'+d*t_y'+t_y
-    })
+    local a, b, c, d, tx, ty = matrixMul(self.matrix, other.matrix)
+    return androssMath.Transform({a, b, c, d, tx, ty})
+end
+
+-- to avoid allocations/garbage if possible
+function androssMath.Transform:setProduct(t1, t2)
+    local a, b, c, d, tx, ty = matrixMul(t1.matrix, t2.matrix)
+    self.matrix[1], self.matrix[2] = a, b
+    self.matrix[3], self.matrix[4] = c, d
+    self.matrix[5], self.matrix[6] = tx, ty
 end
 
 -- Calculated using Minors/Adjugate
